@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx netlify-cli *)",
+      "Bash(ping -c 3 67.207.109.82)",
+      "Bash(nmap -Pn --open -p 22,80,443,8080 67.207.109.82)",
+      "Bash(ls ~/.ssh/)",
+      "Bash(ls ~/Downloads/*.pem ~/Downloads/*.key ~/Downloads/*.pub 2>/dev/null || echo \"none found\")",
+      "Bash(chmod 600 ~/Downloads/ssh-key-2026-06-07.key)",
+      "Bash(ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -i ~/Downloads/ssh-key-2026-06-07.key ubuntu@161.153.48.193 \"echo connected && uname -a\")",
+      "Bash(rsync -avz -e 'ssh -i /Users/mileshiiiwav/Downloads/ssh-key-2026-06-07.key -o StrictHostKeyChecking=no' --delete /Users/mileshiiiwav/Shelfless/dist/ ubuntu@161.153.48.193:/var/www/shelfless/)",
+      "Bash(scp -i /Users/mileshiiiwav/Downloads/ssh-key-2026-06-07.key -o StrictHostKeyChecking=no /Users/mileshiiiwav/Shelfless/nginx.conf ubuntu@161.153.48.193:/tmp/shelfless.nginx.conf)",
+      "Bash(ssh -i /Users/mileshiiiwav/Downloads/ssh-key-2026-06-07.key -o StrictHostKeyChecking=no ubuntu@161.153.48.193 ' *)",
+      "Bash(gh auth *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

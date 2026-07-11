@@ -14,13 +14,14 @@ import {
 } from 'lucide-react';
 import { mockRequests } from '../data/mockData';
 import { useLocation } from '../context/LocationContext';
+import { LOCATION_SUGGESTIONS } from '../utils/locationSuggestions';
 import DesktopHome from './DesktopHome';
 
 const trendingIcons = [Package, ShoppingBag, Droplets, Baby, Zap, Wind];
 
 export default function Home() {
   const navigate = useNavigate();
-  const { locationName, setLocationName, locating, locationError, requestLocation } = useLocation();
+  const { locationName, setLocationName, locating, locationError, requestLocation, resolveTypedLocation } = useLocation();
 
   const handleGetStarted = () => {
     navigate('/feed', { state: { location: locationName } });
@@ -52,11 +53,25 @@ export default function Home() {
           <MapPin size={18} className="text-black flex-shrink-0" />
           <input
             type="text"
+            list="mobile-location-suggestions"
+            autoComplete="address-level2"
             value={locationName}
             onChange={(e) => setLocationName(e.target.value)}
+            onBlur={resolveTypedLocation}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+                resolveTypedLocation();
+              }
+            }}
             placeholder="Neighborhood or city"
             className="flex-1 bg-transparent font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400"
           />
+          <datalist id="mobile-location-suggestions">
+            {LOCATION_SUGGESTIONS.map((suggestion) => (
+              <option key={suggestion} value={suggestion} />
+            ))}
+          </datalist>
         </div>
         <button
           onClick={requestLocation}

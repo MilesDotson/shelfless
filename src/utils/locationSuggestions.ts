@@ -1,0 +1,18 @@
+export const LOCATION_SUGGESTIONS = [
+  'Oakland',
+  'Temescal, Oakland',
+  'Rockridge, Oakland',
+  'West Oakland',
+  'Downtown Oakland',
+  'Lake Merritt, Oakland',
+  'Fruitvale, Oakland',
+  'Berkeley',
+  'Emeryville',
+  'Alameda',
+  'San Francisco',
+  'Brooklyn',
+  'Williamsburg, Brooklyn',
+  'Crown Heights, Brooklyn',
+  'Park Slope, Brooklyn',
+  'Bed-Stuy, Brooklyn',
+]

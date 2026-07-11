@@ -13,6 +13,7 @@ import { useLocation } from '../context/LocationContext';
 import { getFinds, getRequests } from '../lib/dataService';
 import { Find, Request, StockStatus } from '../types';
 import { timeAgo } from '../utils/time';
+import { LOCATION_SUGGESTIONS } from '../utils/locationSuggestions';
 
 const explorePrompts = ['paper towels', 'baby formula', 'vintage lamp', 'sneakers', 'wipes'];
 
@@ -34,7 +35,7 @@ function tickerId(index: number) {
 
 export default function DesktopHome() {
   const navigate = useNavigate();
-  const { locationName, setLocationName, locating, locationError, requestLocation } = useLocation();
+  const { locationName, setLocationName, locating, locationError, requestLocation, resolveTypedLocation } = useLocation();
   const [finds, setFinds] = useState<Find[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,11 +207,25 @@ export default function DesktopHome() {
               <div className="flex items-center gap-2 border border-gray-300 bg-white px-3 py-3">
                 <MapPin size={16} className="shrink-0 text-black" />
                 <input
+                  list="desktop-location-suggestions"
+                  autoComplete="address-level2"
                   value={locationName}
                   onChange={(event) => setLocationName(event.target.value)}
+                  onBlur={resolveTypedLocation}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.currentTarget.blur();
+                      resolveTypedLocation();
+                    }
+                  }}
                   placeholder="NEIGHBORHOOD OR CITY"
                   className="min-w-0 flex-1 bg-transparent font-mono text-sm font-bold uppercase text-black outline-none placeholder-gray-400"
                 />
+                <datalist id="desktop-location-suggestions">
+                  {LOCATION_SUGGESTIONS.map((suggestion) => (
+                    <option key={suggestion} value={suggestion} />
+                  ))}
+                </datalist>
               </div>
               <button
                 onClick={requestLocation}

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { geocodeArea, geolocateByIp, reverseGeocode } from '../utils/geo'
 
 const LOCATION_STORAGE_KEY = 'shelfless_location'
+const DEFAULT_LOCATION = { locationName: 'Oakland', coords: { lat: 37.8044, lon: -122.2712 } }
 
 interface LocationContextValue {
   coords: { lat: number; lon: number } | null
@@ -31,8 +32,9 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       return null
     }
   })()
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(storedLocation?.coords ?? null)
-  const [locationName, setLocationNameState] = useState(storedLocation?.locationName ?? '')
+  const hasStoredLocation = Boolean(storedLocation?.locationName)
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(storedLocation?.coords ?? DEFAULT_LOCATION.coords)
+  const [locationName, setLocationNameState] = useState(storedLocation?.locationName ?? DEFAULT_LOCATION.locationName)
   const [locating, setLocating] = useState(false)
   const [locationError, setLocationError] = useState('')
 
@@ -130,7 +132,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   }
 
   const autopopulateLocation = async () => {
-    if (locationName.trim() || coords || locating) return
+    if ((hasStoredLocation && locationName.trim()) || locating) return
 
     setLocating(true)
     setLocationError('')
@@ -141,10 +143,10 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      setResolvedLocation('Oakland', { lat: 37.8044, lon: -122.2712 })
+      setResolvedLocation(DEFAULT_LOCATION.locationName, DEFAULT_LOCATION.coords)
       setLocationError('Using default Oakland market. Type another area to change it.')
     } catch {
-      setResolvedLocation('Oakland', { lat: 37.8044, lon: -122.2712 })
+      setResolvedLocation(DEFAULT_LOCATION.locationName, DEFAULT_LOCATION.coords)
       setLocationError('Using default Oakland market. Type another area to change it.')
     } finally {
       setLocating(false)

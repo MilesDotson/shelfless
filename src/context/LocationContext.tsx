@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { geocodeArea, reverseGeocode } from '../utils/geo'
+import { geocodeArea, geolocateByIp, reverseGeocode } from '../utils/geo'
 
 const LOCATION_STORAGE_KEY = 'shelfless_location'
 
@@ -129,9 +129,31 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
+  const autopopulateLocation = async () => {
+    if (locationName.trim() || coords || locating) return
+
+    setLocating(true)
+    setLocationError('')
+    try {
+      const result = await geolocateByIp()
+      if (result) {
+        setResolvedLocation(result.city, { lat: result.latitude, lon: result.longitude })
+        return
+      }
+
+      setResolvedLocation('Oakland', { lat: 37.8044, lon: -122.2712 })
+      setLocationError('Using default Oakland market. Type another area to change it.')
+    } catch {
+      setResolvedLocation('Oakland', { lat: 37.8044, lon: -122.2712 })
+      setLocationError('Using default Oakland market. Type another area to change it.')
+    } finally {
+      setLocating(false)
+    }
+  }
+
   // Auto-request on mount
   useEffect(() => {
-    if (window.isSecureContext) requestLocation()
+    autopopulateLocation()
   }, [])
 
   return (

@@ -34,6 +34,13 @@ export interface OverpassElement {
   }
 }
 
+export interface IpLocationResult {
+  city: string
+  region?: string
+  latitude: number
+  longitude: number
+}
+
 const fallbackBusinessesByArea = [
   {
     match: /oakland|bay area|east bay/i,
@@ -78,6 +85,52 @@ export async function geocodeArea(query: string): Promise<NominatimResult | null
   if (!query.trim()) return null
   const results = await searchLocations(query)
   return results[0] ?? null
+}
+
+export async function geolocateByIp(): Promise<IpLocationResult | null> {
+  const controllers: AbortController[] = []
+  const timeout = window.setTimeout(() => controllers.forEach(controller => controller.abort()), 5000)
+
+  try {
+    const providers = [
+      async () => {
+        const controller = new AbortController()
+        controllers.push(controller)
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal })
+        if (!res.ok) throw new Error(`ipapi failed: ${res.status}`)
+        const data = await res.json()
+        if (!data.city || !data.latitude || !data.longitude) return null
+        return {
+          city: data.city,
+          region: data.region,
+          latitude: Number(data.latitude),
+          longitude: Number(data.longitude),
+        }
+      },
+      async () => {
+        const controller = new AbortController()
+        controllers.push(controller)
+        const res = await fetch('https://ipwho.is/', { signal: controller.signal })
+        if (!res.ok) throw new Error(`ipwho failed: ${res.status}`)
+        const data = await res.json()
+        if (!data.success || !data.city || !data.latitude || !data.longitude) return null
+        return {
+          city: data.city,
+          region: data.region,
+          latitude: Number(data.latitude),
+          longitude: Number(data.longitude),
+        }
+      },
+    ]
+
+    for (const provider of providers) {
+      const result = await provider().catch(() => null)
+      if (result) return result
+    }
+    return null
+  } finally {
+    window.clearTimeout(timeout)
+  }
 }
 
 // Reverse geocode lat/lon to address

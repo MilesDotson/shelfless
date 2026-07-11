@@ -16,7 +16,7 @@ export interface ReportState {
   prices: Record<string, string>;
 }
 
-const STEPS = ['Location', 'Products', 'Photos & Stock', 'Confirm'];
+const STEPS = ['Place', 'Products', 'Signal', 'Publish'];
 
 export default function ReportFind() {
   const navigate = useNavigate();
@@ -42,16 +42,16 @@ export default function ReportFind() {
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-[56px] bg-white z-30 px-4 pt-4 pb-3 border-b border-gray-100 shadow-sm">
+      <div className="sticky top-[56px] bg-white z-30 px-4 pt-4 pb-3 border-b border-black">
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={goBack}
-            className="flex items-center gap-1 text-primary font-semibold text-sm"
+            className="flex items-center gap-1 font-mono text-xs font-black uppercase text-black"
           >
             <ChevronLeft size={20} />
             {step === 0 ? 'Cancel' : 'Back'}
           </button>
-          <span className="text-xs text-gray-400 font-medium">
+          <span className="font-mono text-xs font-black uppercase text-gray-400">
             Step {step + 1} of {STEPS.length}
           </span>
         </div>
@@ -62,13 +62,13 @@ export default function ReportFind() {
             <div key={label} className="flex-1 flex flex-col gap-1">
               <div
                 className={`h-1.5 rounded-full transition-colors ${
-                  idx <= step ? 'bg-primary' : 'bg-gray-200'
+                  idx <= step ? 'bg-black' : 'bg-gray-200'
                 }`}
               />
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-1.5">{STEPS[step]}</p>
+        <p className="tape-label mt-1.5">{STEPS[step]} / Add drop to tape</p>
       </div>
 
       <div className="px-4 py-4">

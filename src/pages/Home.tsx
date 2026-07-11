@@ -31,60 +31,61 @@ export default function Home() {
   return (
     <>
     <DesktopHome />
-    <div className="px-4 py-6 lg:hidden">
+    <div className="px-4 py-5 lg:hidden">
       {/* Hero */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-black leading-tight mb-2">
+      <div className="mb-5 border-b border-black pb-5">
+        <p className="tape-label mb-2 text-link">ShelfLess Tape / Mobile</p>
+        <h1 className="tape-title text-[38px]">
           Find what<br />
-          <span className="text-black">big-box search</span><br />
+          big-box search<br />
           misses.
         </h1>
-        <p className="text-gray-500 text-sm leading-relaxed">
-          Community-powered finds at bodegas, garage sales, flea markets & more — right in your neighborhood.
+        <p className="mt-3 font-mono text-xs font-bold uppercase leading-5 text-gray-500">
+          Community stock drops, open bids, and neighborhood product signals.
         </p>
       </div>
 
       {/* Location input */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#E5E5E5] p-4 mb-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Your Location</p>
+      <div className="tape-panel p-4 mb-4">
+        <p className="tape-label mb-2">Browser Location</p>
         <div className="flex items-center gap-2">
           <MapPin size={18} className="text-black flex-shrink-0" />
           <input
             type="text"
             value={locationName}
             onChange={(e) => setLocationName(e.target.value)}
-            placeholder="Enter your neighborhood or city..."
-            className="flex-1 text-sm outline-none text-black placeholder-gray-400"
+            placeholder="Neighborhood or city"
+            className="flex-1 bg-transparent font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400"
           />
         </div>
         <button
           onClick={requestLocation}
           disabled={locating}
-          className="mt-3 flex items-center gap-2 text-link text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50"
+          className="mt-3 flex items-center gap-2 tape-link disabled:opacity-50"
         >
           {locating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
-          {locating ? 'Getting location...' : 'Use my current location'}
+          {locating ? 'Getting Position' : 'Grab Browser Position'}
         </button>
       </div>
 
       {/* CTA button */}
       <button
         onClick={handleGetStarted}
-        className="w-full bg-black text-white font-bold py-4 rounded-2xl text-base shadow-md hover:bg-gray-900 active:scale-95 transition-all flex items-center justify-center gap-2 mb-8"
+        className="w-full tape-button flex items-center justify-center gap-2 mb-6"
       >
         <Search size={20} />
-        Get Started
+        Open Tape
       </button>
 
       {/* Trending / Most Desired */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-black">Most Desired Items</h2>
+          <h2 className="tape-title text-lg">Top Open Bids</h2>
           <button
             onClick={() => navigate('/requests')}
-            className="text-link text-xs font-semibold hover:opacity-80"
+            className="tape-link"
           >
-            See all
+            View all
           </button>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -94,14 +95,14 @@ export default function Home() {
               <button
                 key={req.id}
                 onClick={() => navigate('/requests')}
-                className="bg-white rounded-2xl shadow-sm border border-[#E5E5E5] p-3 flex items-center gap-3 hover:border-gray-400 active:scale-95 transition-all text-left"
+                className="tape-panel p-3 flex items-center gap-3 hover:border-black active:scale-95 transition-all text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 border border-gray-300 bg-white flex items-center justify-center flex-shrink-0">
                   <Icon size={20} className="text-black" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-black leading-tight line-clamp-2">{req.productName}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{req.responseCount} hunters</p>
+                  <p className="font-mono text-xs font-black uppercase text-black leading-tight line-clamp-2">{req.productName}</p>
+                  <p className="text-[10px] font-mono font-bold uppercase text-gray-400 mt-0.5">{req.responseCount} hunters</p>
                 </div>
               </button>
             );
@@ -113,19 +114,19 @@ export default function Home() {
       <div className="mt-8 grid grid-cols-2 gap-3">
         <button
           onClick={() => navigate('/feed')}
-          className="bg-black text-white rounded-2xl p-4 flex flex-col items-start gap-2 shadow-sm hover:bg-gray-900 active:scale-95 transition-all"
+          className="bg-black text-white p-4 flex flex-col items-start gap-2 hover:bg-gray-900 active:scale-95 transition-all"
         >
           <Search size={22} />
-          <span className="font-bold text-sm">Browse Finds</span>
-          <span className="text-xs opacity-80">See what's been spotted nearby</span>
+          <span className="font-black uppercase text-sm">Browse Tape</span>
+          <span className="font-mono text-xs uppercase opacity-80">Live product drops</span>
         </button>
         <button
           onClick={() => navigate('/report')}
-          className="bg-black text-white rounded-2xl p-4 flex flex-col items-start gap-2 shadow-sm hover:bg-gray-900 active:scale-95 transition-all"
+          className="bg-black text-white p-4 flex flex-col items-start gap-2 hover:bg-gray-900 active:scale-95 transition-all"
         >
           <ShoppingBag size={22} />
-          <span className="font-bold text-sm">Report a Find</span>
-          <span className="text-xs opacity-80">Help your community shop smarter</span>
+          <span className="font-black uppercase text-sm">Add Drop</span>
+          <span className="font-mono text-xs uppercase opacity-80">Report stock now</span>
         </button>
       </div>
     </div>

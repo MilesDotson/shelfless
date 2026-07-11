@@ -45,10 +45,10 @@ export default function CreateRequest() {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.productName.trim()) newErrors.productName = 'Item name is required';
+    if (!form.productName.trim()) newErrors.productName = 'Product is required';
     if (!form.category) newErrors.category = 'Please select a category';
-    if (!form.description.trim()) newErrors.description = 'Description is required';
-    if (!form.searchArea.trim()) newErrors.searchArea = 'Search area is required';
+    if (!form.description.trim()) newErrors.description = 'Bid notes are required';
+    if (!form.searchArea.trim()) newErrors.searchArea = 'Market area is required';
     if (!form.expiresAt) newErrors.expiresAt = 'Expiration date is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -73,9 +73,9 @@ export default function CreateRequest() {
     });
 
     if (result) {
-      setToast('Request posted! Scavengers will be on the hunt.');
+      setToast('Bid posted to the tape.');
     } else {
-      setToast('Request posted locally. Will sync when connection is restored.');
+      setToast('Bid failed to sync. Try again.');
     }
     setTimeout(() => navigate('/requests'), 2000);
   };
@@ -85,30 +85,30 @@ export default function CreateRequest() {
       {toast && <Toast message={toast} onClose={() => setToast('')} duration={4000} />}
 
       {/* Header */}
-      <div className="sticky top-[56px] bg-white z-30 px-4 pt-4 pb-3 border-b border-gray-200 shadow-sm flex items-center gap-2">
+      <div className="sticky top-[56px] bg-white z-30 px-4 pt-4 pb-3 border-b border-black flex items-center gap-2">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-black font-semibold text-sm"
+          className="flex items-center gap-1 font-mono text-xs font-black uppercase text-black"
         >
           <ChevronLeft size={20} />
           Cancel
         </button>
-        <h1 className="text-base font-bold text-black flex-1 text-center pr-16">Post a Request</h1>
+        <h1 className="tape-title text-base flex-1 text-center pr-16">Post Bid</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="px-4 py-5 space-y-5">
         {/* Item name */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">
-            Item Name <span className="text-red-400">*</span>
+          <label className="block tape-label mb-1.5">
+            Product <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             value={form.productName}
             onChange={(e) => setField('productName', e.target.value)}
-            placeholder="e.g. Baby Formula, Disinfectant Wipes..."
-            className={`w-full border rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black placeholder-gray-400 ${
-              errors.productName ? 'border-red-400' : 'border-[#E5E5E5]'
+            placeholder="Baby Formula, Disinfectant Wipes..."
+            className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black placeholder-gray-400 ${
+              errors.productName ? 'border-red-400' : 'border-gray-300'
             }`}
           />
           {errors.productName && <p className="text-xs text-red-400 mt-1">{errors.productName}</p>}
@@ -116,17 +116,17 @@ export default function CreateRequest() {
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">
+          <label className="block tape-label mb-1.5">
             Category <span className="text-red-400">*</span>
           </label>
           <select
             value={form.category}
             onChange={(e) => setField('category', e.target.value)}
-            className={`w-full border rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black bg-white ${
-              errors.category ? 'border-red-400' : 'border-[#E5E5E5]'
+            className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black bg-white ${
+              errors.category ? 'border-red-400' : 'border-gray-300'
             }`}
           >
-            <option value="">Select a category...</option>
+            <option value="">Select category...</option>
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -134,18 +134,18 @@ export default function CreateRequest() {
           {errors.category && <p className="text-xs text-red-400 mt-1">{errors.category}</p>}
         </div>
 
-        {/* Description */}
+        {/* Bid Notes */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">
-            Description <span className="text-red-400">*</span>
+          <label className="block tape-label mb-1.5">
+            Bid Notes <span className="text-red-400">*</span>
           </label>
           <textarea
             value={form.description}
             onChange={(e) => setField('description', e.target.value)}
-            placeholder="Brand preference, quantity needed, any specific requirements..."
+            placeholder="Brand, quantity, requirements..."
             rows={3}
-            className={`w-full border rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black placeholder-gray-400 resize-none ${
-              errors.description ? 'border-red-400' : 'border-[#E5E5E5]'
+            className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black placeholder-gray-400 resize-none ${
+              errors.description ? 'border-red-400' : 'border-gray-300'
             }`}
           />
           {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
@@ -153,16 +153,16 @@ export default function CreateRequest() {
 
         {/* Search area */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">
-            Search Area <span className="text-red-400">*</span>
+          <label className="block tape-label mb-1.5">
+            Market Area <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             value={form.searchArea}
             onChange={(e) => setField('searchArea', e.target.value)}
-            placeholder="e.g. Crown Heights, Brooklyn or any neighborhood"
-            className={`w-full border rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black placeholder-gray-400 ${
-              errors.searchArea ? 'border-red-400' : 'border-[#E5E5E5]'
+            placeholder="Crown Heights, Brooklyn or any neighborhood"
+            className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black placeholder-gray-400 ${
+              errors.searchArea ? 'border-red-400' : 'border-gray-300'
             }`}
           />
           {errors.searchArea && <p className="text-xs text-red-400 mt-1">{errors.searchArea}</p>}
@@ -170,11 +170,11 @@ export default function CreateRequest() {
 
         {/* Condition */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">Condition</label>
+          <label className="block tape-label mb-1.5">Condition</label>
           <select
             value={form.condition}
             onChange={(e) => setField('condition', e.target.value)}
-            className="w-full border border-[#E5E5E5] rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black bg-white"
+            className="w-full border border-gray-300 px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black bg-white"
           >
             {CONDITIONS.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
@@ -182,33 +182,33 @@ export default function CreateRequest() {
           </select>
         </div>
 
-        {/* Max price + Reward side by side */}
+        {/* Max price + Bounty side by side */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-bold text-black mb-1.5">Max Price <span className="font-normal text-gray-400 text-xs">(optional)</span></label>
-            <div className="flex items-center border border-[#E5E5E5] rounded-xl px-3 py-3 bg-white">
+            <label className="block tape-label mb-1.5">Max Ask <span className="font-normal text-gray-400 text-xs">(optional)</span></label>
+            <div className="flex items-center border border-gray-300 px-3 py-3 bg-white">
               <span className="text-gray-400 mr-1 text-sm">$</span>
               <input
                 type="number"
                 value={form.maxPrice}
                 onChange={(e) => setField('maxPrice', e.target.value)}
                 placeholder="0"
-                className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent w-full"
+                className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent w-full"
                 min="0"
                 step="1"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold text-black mb-1.5">Reward <span className="font-normal text-gray-400 text-xs">(optional)</span></label>
-            <div className="flex items-center border border-[#E5E5E5] rounded-xl px-3 py-3 bg-white">
+            <label className="block tape-label mb-1.5">Bounty <span className="font-normal text-gray-400 text-xs">(optional)</span></label>
+            <div className="flex items-center border border-gray-300 px-3 py-3 bg-white">
               <span className="text-gray-400 mr-1 text-sm">$</span>
               <input
                 type="number"
                 value={form.reward}
                 onChange={(e) => setField('reward', e.target.value)}
                 placeholder="0"
-                className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent w-full"
+                className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent w-full"
                 min="0"
                 step="1"
               />
@@ -216,19 +216,19 @@ export default function CreateRequest() {
           </div>
         </div>
 
-        {/* Urgency */}
+        {/* Bid Signal */}
         <div>
-          <label className="block text-sm font-bold text-black mb-2">Urgency</label>
+          <label className="block tape-label mb-2">Bid Signal</label>
           <div className="grid grid-cols-4 gap-2">
             {URGENCIES.map((u) => (
               <button
                 key={u}
                 type="button"
                 onClick={() => setField('urgency', u)}
-                className={`py-2 rounded-xl border-2 text-xs font-semibold transition-all ${
+                className={`py-2 border font-mono text-[10px] font-black uppercase transition-all ${
                   form.urgency === u
                     ? 'border-black bg-black text-white'
-                    : 'border-gray-200 bg-white text-gray-500 hover:border-gray-400'
+                    : 'border-gray-300 bg-white text-gray-500 hover:border-black'
                 }`}
               >
                 {u}
@@ -239,16 +239,16 @@ export default function CreateRequest() {
 
         {/* Expiration */}
         <div>
-          <label className="block text-sm font-bold text-black mb-1.5">
-            Expiration Date <span className="text-red-400">*</span>
+          <label className="block tape-label mb-1.5">
+            Expires <span className="text-red-400">*</span>
           </label>
           <input
             type="date"
             value={form.expiresAt}
             onChange={(e) => setField('expiresAt', e.target.value)}
             min={new Date().toISOString().split('T')[0]}
-            className={`w-full border rounded-xl px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-black/20 focus:border-black text-black bg-white ${
-              errors.expiresAt ? 'border-red-400' : 'border-[#E5E5E5]'
+            className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black bg-white ${
+              errors.expiresAt ? 'border-red-400' : 'border-gray-300'
             }`}
           />
           {errors.expiresAt && <p className="text-xs text-red-400 mt-1">{errors.expiresAt}</p>}
@@ -257,9 +257,9 @@ export default function CreateRequest() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-black text-white font-bold py-4 rounded-2xl text-base shadow-md hover:bg-gray-900 active:scale-95 transition-all disabled:opacity-50 mt-2"
+          className="w-full tape-button active:scale-95 transition-all disabled:opacity-50 mt-2"
         >
-          {submitting ? 'Posting...' : 'Post Request'}
+          {submitting ? 'Posting Bid...' : 'Post Bid'}
         </button>
       </form>
     </div>

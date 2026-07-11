@@ -48,17 +48,18 @@ export default function FindCard({ find, onToggleSave }: FindCardProps) {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm border border-[#E5E5E5] overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
+      className="tape-panel cursor-pointer overflow-hidden transition-colors hover:border-black"
       onClick={() => navigate(`/find/${find.id}`)}
     >
-      <div className="p-4">
+      <div className="p-3">
         {/* Header row */}
-        <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-start justify-between gap-2 border-b border-gray-300 pb-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-black text-base leading-tight truncate">
+            <p className="tape-label mb-1">Drop / {find.product.category}</p>
+            <h3 className="tape-title truncate text-xl">
               {find.product.name}
             </h3>
-            <div className="flex items-center gap-1 mt-0.5 text-gray-500">
+            <div className="mt-2 flex items-center gap-1 font-mono text-[10px] font-bold uppercase text-gray-500">
               <MapPin size={12} className="flex-shrink-0" />
               <span className="text-xs truncate">{find.location.placeName}</span>
               <span className="text-gray-300 text-xs">•</span>
@@ -68,16 +69,16 @@ export default function FindCard({ find, onToggleSave }: FindCardProps) {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={(e) => { e.stopPropagation(); onToggleSave(find.id); }}
-              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+              className="border border-gray-300 bg-white p-1.5 hover:border-black transition-colors"
             >
               <Heart
                 size={18}
-                className={find.saved ? 'fill-red-500 text-red-500' : 'text-gray-400'}
+                className={find.saved ? 'fill-black text-black' : 'text-gray-400'}
               />
             </button>
             <button
               onClick={handleShare}
-              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+              className="border border-gray-300 bg-white p-1.5 hover:border-black transition-colors"
             >
               <Share2 size={18} className="text-gray-400" />
             </button>
@@ -85,23 +86,23 @@ export default function FindCard({ find, onToggleSave }: FindCardProps) {
         </div>
 
         {/* Stock badge + price */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <div className="flex items-center gap-2 border-b border-gray-300 py-3 flex-wrap">
           <StockBadge status={find.stockStatus} />
           {find.price !== undefined && (
-            <span className="text-sm font-semibold text-black">${find.price.toFixed(2)}</span>
+            <span className="font-mono text-sm font-black text-black">${find.price.toFixed(2)}</span>
           )}
-          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+          <span className="border border-gray-300 bg-white px-2 py-0.5 font-mono text-[10px] font-black uppercase text-gray-600">
             {sourceTypeLabel[find.sourceType]}
           </span>
         </div>
 
         {/* Notes */}
         {find.notes && (
-          <p className="text-xs text-gray-500 mb-3 line-clamp-2">{find.notes}</p>
+          <p className="border-b border-gray-300 py-3 font-mono text-[11px] font-bold uppercase text-gray-500 line-clamp-2">{find.notes}</p>
         )}
 
         {/* Footer row */}
-        <div className="flex items-center justify-between text-xs text-gray-400">
+        <div className="flex items-center justify-between pt-3 font-mono text-[10px] font-bold uppercase text-gray-400">
           <div className="flex items-center gap-1">
             <Clock size={12} />
             <span>{timeAgo(find.createdAt)}</span>
@@ -117,7 +118,7 @@ export default function FindCard({ find, onToggleSave }: FindCardProps) {
             )}
             <CheckCircle size={12} className={verificationColor[find.verificationStatus]} />
             <span className={`${verificationColor[find.verificationStatus]} font-medium`}>
-              {find.verificationStatus}
+              {find.verificationStatus.replace('Community ', '').replace('Recently ', '')}
             </span>
           </div>
         </div>

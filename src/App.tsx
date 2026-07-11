@@ -12,11 +12,12 @@ import CreateRequest from './pages/CreateRequest';
 function Profile() {
   return (
     <div className="px-4 py-8 text-center text-gray-500">
-      <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-        <span className="text-3xl font-black text-primary">Y</span>
+      <div className="w-20 h-20 border border-black bg-white flex items-center justify-center mx-auto mb-4">
+        <span className="text-3xl font-black text-black">Y</span>
       </div>
-      <h2 className="text-xl font-black text-[#1A1A2E] mb-1">Your Profile</h2>
-      <p className="text-sm text-gray-400">Coming soon — rep score, badges & history.</p>
+      <p className="tape-label text-link mb-2">Operator Profile</p>
+      <h2 className="tape-title text-3xl mb-2">Your Signal</h2>
+      <p className="font-mono text-xs font-bold uppercase text-gray-400">Rep score, badges, and tape history coming soon.</p>
     </div>
   );
 }

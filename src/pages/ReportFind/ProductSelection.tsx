@@ -48,23 +48,24 @@ export default function ProductSelection({ location, selected, onSelect, onConti
   return (
     <div>
       {/* Selected location chip */}
-      <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2 mb-5">
+      <div className="flex items-center gap-2 border border-gray-300 bg-white px-3 py-2 mb-5">
         <MapPin size={14} className="text-black flex-shrink-0" />
-        <span className="text-sm font-semibold text-black truncate">{location.placeName}</span>
+        <span className="font-mono text-xs font-black uppercase text-black truncate">{location.placeName}</span>
       </div>
 
-      <h2 className="text-xl font-black text-black mb-1">What did you find?</h2>
-      <p className="text-sm text-gray-500 mb-4">Select all items you spotted at this location.</p>
+      <p className="tape-label mb-2 text-link">Product Signal</p>
+      <h2 className="tape-title text-3xl mb-2">What entered the tape?</h2>
+      <p className="font-mono text-xs font-bold uppercase text-gray-500 mb-4">Select every product spotted at this place.</p>
 
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5 shadow-sm mb-4">
+      <div className="flex items-center gap-2 bg-white border border-gray-300 px-3 py-2.5 mb-4">
         <Search size={16} className="text-gray-400 flex-shrink-0" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search products..."
-          className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent"
+          className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent"
         />
       </div>
 
@@ -76,22 +77,22 @@ export default function ProductSelection({ location, selected, onSelect, onConti
             <button
               key={product.id}
               onClick={() => toggle(product)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left active:scale-95 ${
+              className={`w-full flex items-center gap-3 p-3 border transition-all text-left active:scale-95 ${
                 isSelected
-                  ? 'border-black bg-gray-50'
-                  : 'border-gray-100 bg-white hover:border-gray-300'
+                  ? 'border-black bg-black text-white'
+                  : 'border-gray-300 bg-white hover:border-black'
               }`}
             >
               <div
-                className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                  isSelected ? 'border-black bg-black' : 'border-gray-300 bg-white'
+                className={`w-6 h-6 border flex items-center justify-center flex-shrink-0 transition-colors ${
+                  isSelected ? 'border-white bg-white' : 'border-gray-300 bg-white'
                 }`}
               >
-                {isSelected && <Check size={14} className="text-white" />}
+                {isSelected && <Check size={14} className="text-black" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-black">{product.name}</p>
-                <p className="text-xs text-gray-400">{product.category}</p>
+                <p className={`font-mono text-sm font-black uppercase ${isSelected ? 'text-white' : 'text-black'}`}>{product.name}</p>
+                <p className={`font-mono text-[10px] font-bold uppercase ${isSelected ? 'text-gray-300' : 'text-gray-400'}`}>{product.category}</p>
               </div>
             </button>
           );
@@ -108,12 +109,12 @@ export default function ProductSelection({ location, selected, onSelect, onConti
             onChange={(e) => setCustomProduct(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addCustom()}
             placeholder="Product name..."
-            className="flex-1 border border-[#E5E5E5] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-black"
+            className="flex-1 border border-gray-300 px-3 py-2.5 font-mono text-xs font-black uppercase outline-none focus:border-black"
           />
           <button
             onClick={addCustom}
             disabled={!customProduct.trim()}
-            className="bg-black text-white px-4 rounded-xl text-sm font-semibold disabled:opacity-50 hover:bg-gray-900"
+            className="tape-button disabled:opacity-50"
           >
             Add
           </button>
@@ -121,7 +122,7 @@ export default function ProductSelection({ location, selected, onSelect, onConti
       ) : (
         <button
           onClick={() => setShowCustomInput(true)}
-          className="w-full flex items-center gap-2 p-3 rounded-xl border-2 border-dashed border-gray-300 text-link text-sm font-medium hover:border-black transition-colors mb-4"
+          className="w-full flex items-center gap-2 p-3 border border-dashed border-gray-400 text-link font-mono text-xs font-black uppercase hover:border-black transition-colors mb-4"
         >
           <Plus size={18} />
           Add custom product
@@ -131,9 +132,9 @@ export default function ProductSelection({ location, selected, onSelect, onConti
       <button
         onClick={onContinue}
         disabled={selected.length === 0}
-        className="w-full bg-black text-white font-bold py-4 rounded-2xl text-base shadow-md hover:bg-gray-900 active:scale-95 transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+        className="w-full tape-button active:scale-95 transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
       >
-        Continue ({selected.length} selected)
+        Continue / {selected.length} Selected
       </button>
     </div>
   );

@@ -74,12 +74,12 @@ export default function PhotosStock({
     <div>
       {/* Product progress */}
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-black text-black">Photos & Stock</h2>
-        <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+        <h2 className="tape-title text-3xl">Stock Signal</h2>
+        <span className="border border-gray-300 bg-white px-2 py-1 font-mono text-xs font-black uppercase text-gray-400">
           {currentIdx + 1} / {products.length}
         </span>
       </div>
-      <p className="text-sm font-semibold text-black mb-5">{currentProduct.name}</p>
+      <p className="font-mono text-xs font-black uppercase text-link mb-5">{currentProduct.name}</p>
 
       {/* Product mini tabs */}
       {products.length > 1 && (
@@ -88,8 +88,8 @@ export default function PhotosStock({
             <button
               key={p.id}
               onClick={() => setCurrentIdx(idx)}
-              className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                idx === currentIdx ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              className={`flex-shrink-0 border px-3 py-1 font-mono text-[10px] font-black uppercase transition-colors ${
+                idx === currentIdx ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-gray-600 hover:border-black'
               }`}
             >
               {p.name}
@@ -100,7 +100,7 @@ export default function PhotosStock({
 
       {/* Add Pictures */}
       <div className="mb-5">
-        <p className="text-sm font-bold text-black mb-3 flex items-center gap-2">
+        <p className="tape-label mb-3 flex items-center gap-2">
           <Camera size={16} />
           Add Pictures <span className="text-gray-400 font-normal text-xs">({photoCount}/5)</span>
         </p>
@@ -108,12 +108,12 @@ export default function PhotosStock({
           {Array.from({ length: photoCount }).map((_, idx) => (
             <div
               key={idx}
-              className="relative w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center"
+              className="relative w-20 h-20 border border-gray-300 bg-white flex items-center justify-center"
             >
               <Camera size={20} className="text-gray-400" />
               <button
                 onClick={() => removePhoto(idx)}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-black text-white flex items-center justify-center"
               >
                 <X size={12} />
               </button>
@@ -122,10 +122,10 @@ export default function PhotosStock({
           {photoCount < 5 && (
             <button
               onClick={addPhoto}
-              className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-black hover:text-black transition-colors"
+              className="w-20 h-20 border border-dashed border-gray-400 flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-black hover:text-black transition-colors"
             >
               <Plus size={20} />
-              <span className="text-[10px]">Add</span>
+              <span className="font-mono text-[10px] font-black uppercase">Add</span>
             </button>
           )}
         </div>
@@ -133,19 +133,19 @@ export default function PhotosStock({
 
       {/* Stock Status */}
       <div className="mb-5">
-        <p className="text-sm font-bold text-black mb-3">Stock Status</p>
+        <p className="tape-label mb-3">Stock Status</p>
         <div className="space-y-2">
           {STOCK_OPTIONS.map((status) => (
             <button
               key={status}
               onClick={() => setStock(status)}
-              className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+              className={`w-full flex items-center justify-between p-3 border transition-all ${
                 stockStatuses[currentProduct.id] === status
                   ? 'border-black bg-black text-white'
-                  : 'border-gray-100 bg-white hover:border-gray-300'
+                  : 'border-gray-300 bg-white hover:border-black'
               }`}
             >
-              <span className={`text-sm font-medium ${stockStatuses[currentProduct.id] === status ? 'text-white' : 'text-black'}`}>
+              <span className={`font-mono text-xs font-black uppercase ${stockStatuses[currentProduct.id] === status ? 'text-white' : 'text-black'}`}>
                 {status}
               </span>
               {stockStatuses[currentProduct.id] === status && (
@@ -158,15 +158,15 @@ export default function PhotosStock({
 
       {/* Price (optional) */}
       <div className="mb-5">
-        <p className="text-sm font-bold text-black mb-2">Price <span className="font-normal text-gray-400">(optional)</span></p>
-        <div className="flex items-center bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5 shadow-sm">
-          <span className="text-gray-400 mr-1 text-sm">$</span>
+        <p className="tape-label mb-2">Price <span className="font-normal text-gray-400">(optional)</span></p>
+        <div className="flex items-center bg-white border border-gray-300 px-3 py-2.5">
+          <span className="text-gray-400 mr-1 font-mono text-sm font-black">$</span>
           <input
             type="number"
             value={prices[currentProduct.id] ?? ''}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="0.00"
-            className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent"
+            className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent"
             step="0.01"
             min="0"
           />
@@ -175,21 +175,21 @@ export default function PhotosStock({
 
       {/* Notes */}
       <div className="mb-6">
-        <p className="text-sm font-bold text-black mb-2">Notes <span className="font-normal text-gray-400">(optional)</span></p>
+        <p className="tape-label mb-2">Notes <span className="font-normal text-gray-400">(optional)</span></p>
         <textarea
           value={notes[currentProduct.id] ?? ''}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="e.g. Brand, quantity, shelf location, condition..."
+          placeholder="Brand, quantity, shelf location, condition..."
           rows={3}
-          className="w-full bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-black text-black placeholder-gray-400 resize-none shadow-sm"
+          className="w-full bg-white border border-gray-300 px-3 py-2.5 font-mono text-xs font-black uppercase outline-none focus:border-black text-black placeholder-gray-400 resize-none"
         />
       </div>
 
       <button
         onClick={handleContinue}
-        className="w-full bg-black text-white font-bold py-4 rounded-2xl text-base shadow-md hover:bg-gray-900 active:scale-95 transition-all"
+        className="w-full tape-button active:scale-95 transition-all"
       >
-        {isLast ? 'Review & Confirm' : `Next: ${products[currentIdx + 1]?.name}`}
+        {isLast ? 'Review / Publish' : `Next / ${products[currentIdx + 1]?.name}`}
       </button>
     </div>
   );

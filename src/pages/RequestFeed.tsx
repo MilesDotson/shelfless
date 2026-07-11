@@ -42,19 +42,20 @@ export default function RequestFeed() {
       {toast && <Toast message={toast} onClose={() => setToast('')} />}
 
       {/* Header */}
-      <div className="sticky top-[56px] bg-[#F5F5F5] z-30 px-4 pt-4 pb-3 border-b border-gray-200">
+      <div className="sticky top-[56px] bg-[#F5F5F5] z-30 px-4 pt-4 pb-3 border-b border-black">
+        <p className="tape-label text-link">Community Demand</p>
         <div className="flex items-center gap-2 mb-3">
           <MapPin size={16} className="text-black" />
-          <h1 className="text-base font-bold text-black">Open Requests Near You</h1>
+          <h1 className="tape-title text-3xl">Open Bids</h1>
         </div>
-        <div className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5 shadow-sm">
+        <div className="flex items-center gap-2 bg-white border border-gray-300 px-3 py-2.5">
           <Search size={16} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search requests..."
-            className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent"
+            placeholder="Search bids..."
+            className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent"
           />
         </div>
       </div>
@@ -62,28 +63,28 @@ export default function RequestFeed() {
       <div className="px-4 py-4 pb-24">
         <div className="flex items-center justify-between mb-4">
           {loading ? (
-            <span className="text-xs text-gray-400 font-medium">Loading...</span>
+            <span className="tape-label">Loading...</span>
           ) : (
-            <span className="text-xs text-gray-400 font-medium">{openRequests.length} open request{openRequests.length !== 1 ? 's' : ''}</span>
+            <span className="tape-label">{openRequests.length} open bid{openRequests.length !== 1 ? 's' : ''}</span>
           )}
           <button
             onClick={() => navigate('/requests/new')}
-            className="text-xs text-link font-semibold hover:opacity-80"
+            className="tape-link"
           >
-            + Post request
+            + Post Bid
           </button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12 text-gray-400">
             <Loader2 size={24} className="animate-spin mr-2" />
-            <span className="text-sm">Loading requests...</span>
+            <span className="font-mono text-xs font-black uppercase">Loading bids...</span>
           </div>
         ) : openRequests.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <Search size={40} className="mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No open requests found</p>
-            <p className="text-xs mt-1">Try a different search or post one yourself</p>
+            <p className="font-mono text-xs font-black uppercase">No open bids found</p>
+            <p className="text-xs mt-1">Try another product or post a bid</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -97,7 +98,7 @@ export default function RequestFeed() {
       {/* FAB */}
       <button
         onClick={() => navigate('/requests/new')}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-black text-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-900 active:scale-95 transition-all z-40"
+        className="fixed bottom-20 right-4 w-14 h-14 bg-black text-white border-4 border-white flex items-center justify-center hover:bg-gray-900 active:scale-95 transition-all z-40"
       >
         <Plus size={24} />
       </button>

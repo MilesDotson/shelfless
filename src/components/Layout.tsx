@@ -14,18 +14,18 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-[#F5F5F5] flex flex-col">
       {/* Top bar */}
-      <header className="bg-white text-black px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-gray-200 lg:px-8">
+      <header className="bg-white text-black px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-black lg:px-8">
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-black tracking-tight">
+          <span className="text-2xl font-black tracking-normal">
             <span className="text-black">Shelf</span><span className="text-link">Less</span>
           </span>
         </div>
-        <div className="hidden lg:flex items-center gap-2 text-sm font-semibold">
+        <div className="hidden lg:flex items-center gap-2 font-mono text-xs font-black uppercase">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `rounded-full px-4 py-2 transition-colors ${isActive ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-black'}`
+              `border px-4 py-2 transition-colors ${isActive ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'}`
             }
           >
             Dashboard
@@ -33,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
           <NavLink
             to="/feed"
             className={({ isActive }) =>
-              `rounded-full px-4 py-2 transition-colors ${isActive ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-black'}`
+              `border px-4 py-2 transition-colors ${isActive ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'}`
             }
           >
             Feed
@@ -41,21 +41,21 @@ export default function Layout({ children }: LayoutProps) {
           <NavLink
             to="/requests"
             className={({ isActive }) =>
-              `rounded-full px-4 py-2 transition-colors ${isActive ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-black'}`
+              `border px-4 py-2 transition-colors ${isActive ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'}`
             }
           >
             Requests
           </NavLink>
           <button
             onClick={() => navigate('/report')}
-            className="rounded-full bg-black px-4 py-2 text-white transition-colors hover:bg-gray-900"
+            className="border border-black bg-black px-4 py-2 text-white transition-colors hover:bg-gray-900"
           >
-            Add Find
+            Add Drop
           </button>
         </div>
         <button
           onClick={() => navigate('/profile')}
-          className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+          className="w-8 h-8 border border-gray-300 bg-white flex items-center justify-center hover:border-black transition-colors"
         >
           <User size={18} className="text-black" />
         </button>
@@ -67,7 +67,7 @@ export default function Layout({ children }: LayoutProps) {
       </main>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 h-[60px] bg-white border-t border-gray-200 flex items-center z-50 shadow-lg lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 h-[60px] bg-white border-t border-black flex items-center z-50 lg:hidden">
         <div className="max-w-md mx-auto w-full flex items-center justify-around h-full px-2">
           <NavLink
             to="/"
@@ -79,7 +79,7 @@ export default function Layout({ children }: LayoutProps) {
             }
           >
             <Home size={22} />
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-[10px] font-black uppercase">Tape</span>
           </NavLink>
 
           <NavLink
@@ -91,7 +91,7 @@ export default function Layout({ children }: LayoutProps) {
             }
           >
             <Search size={22} />
-            <span className="text-[10px] font-medium">Feed</span>
+            <span className="text-[10px] font-black uppercase">Feed</span>
           </NavLink>
 
           <NavLink
@@ -102,10 +102,10 @@ export default function Layout({ children }: LayoutProps) {
               }`
             }
           >
-            <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center shadow-md -mt-5 border-4 border-white">
+            <div className="w-12 h-12 bg-black flex items-center justify-center -mt-5 border-4 border-white">
               <Plus size={24} className="text-white" />
             </div>
-            <span className="text-[10px] font-medium mt-0.5">Report</span>
+            <span className="text-[10px] font-black uppercase mt-0.5">Add</span>
           </NavLink>
 
           <NavLink
@@ -117,7 +117,7 @@ export default function Layout({ children }: LayoutProps) {
             }
           >
             <List size={22} />
-            <span className="text-[10px] font-medium">Requests</span>
+            <span className="text-[10px] font-black uppercase">Bids</span>
           </NavLink>
 
           <NavLink
@@ -129,7 +129,7 @@ export default function Layout({ children }: LayoutProps) {
             }
           >
             <User size={22} />
-            <span className="text-[10px] font-medium">Profile</span>
+            <span className="text-[10px] font-black uppercase">User</span>
           </NavLink>
         </div>
       </nav>

@@ -10,10 +10,10 @@ type FilterType = 'all' | SourceType;
 
 const filterOptions: { label: string; value: FilterType }[] = [
   { label: 'All', value: 'all' },
-  { label: 'Stores', value: 'store' },
-  { label: 'Bodegas', value: 'bodega' },
-  { label: 'Garage Sales', value: 'garage sale' },
-  { label: 'Flea Markets', value: 'flea market' },
+  { label: 'Store', value: 'store' },
+  { label: 'Bodega', value: 'bodega' },
+  { label: 'Garage', value: 'garage sale' },
+  { label: 'Flea', value: 'flea market' },
 ];
 
 export default function Feed() {
@@ -55,19 +55,23 @@ export default function Feed() {
   return (
     <div>
       {/* Search bar */}
-      <div className="sticky top-[56px] bg-[#F5F5F5] z-30 px-4 pt-4 pb-3 border-b border-gray-200">
+      <div className="sticky top-[56px] bg-[#F5F5F5] z-30 px-4 pt-4 pb-3 border-b border-black">
+        <div className="mb-3">
+          <p className="tape-label text-link">ShelfLess Feed</p>
+          <h1 className="tape-title text-3xl">Live Drops</h1>
+        </div>
         <div className="flex gap-2 mb-3">
-          <div className="flex-1 flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5 shadow-sm">
+          <div className="flex-1 flex items-center gap-2 bg-white border border-gray-300 px-3 py-2.5">
             <Search size={16} className="text-gray-400 flex-shrink-0" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search items, stores..."
-              className="flex-1 text-sm outline-none text-black placeholder-gray-400 bg-transparent"
+              placeholder="Search tape..."
+              className="flex-1 font-mono text-xs font-black uppercase outline-none text-black placeholder-gray-400 bg-transparent"
             />
           </div>
-          <button className="bg-white border border-[#E5E5E5] rounded-xl px-3 flex items-center shadow-sm hover:bg-gray-50">
+          <button className="bg-white border border-gray-300 px-3 flex items-center hover:border-black">
             <SlidersHorizontal size={18} className="text-gray-500" />
           </button>
         </div>
@@ -78,10 +82,10 @@ export default function Feed() {
             <button
               key={opt.value}
               onClick={() => setActiveFilter(opt.value)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              className={`flex-shrink-0 border px-3 py-1.5 font-mono text-[10px] font-black uppercase transition-colors ${
                 activeFilter === opt.value
-                  ? 'bg-black text-white'
-                  : 'bg-white text-gray-600 border border-[#E5E5E5] hover:border-gray-400'
+                  ? 'border-black bg-black text-white'
+                  : 'border-gray-300 bg-white text-gray-600 hover:border-black'
               }`}
             >
               {opt.label}
@@ -94,28 +98,28 @@ export default function Feed() {
         {/* Report CTA */}
         <button
           onClick={() => navigate('/report')}
-          className="w-full mb-5 flex items-center justify-center gap-2 border border-dashed border-black rounded-2xl py-3 text-link font-semibold text-sm hover:bg-gray-50 active:scale-95 transition-all"
+          className="w-full mb-5 flex items-center justify-center gap-2 border border-black bg-white py-3 font-mono text-xs font-black uppercase text-link hover:bg-gray-100 active:scale-95 transition-all"
         >
           <Plus size={18} />
-          Report a new find
+          Add New Drop
         </button>
 
         {/* Finds list */}
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-black">Recent Finds</h2>
-          {!loading && <span className="text-xs text-gray-400">{filtered.length} found</span>}
+          <h2 className="tape-title text-base">Product Tape</h2>
+          {!loading && <span className="tape-label">{filtered.length} listed</span>}
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12 text-gray-400">
             <Loader2 size={24} className="animate-spin mr-2" />
-            <span className="text-sm">Loading finds...</span>
+            <span className="font-mono text-xs font-black uppercase">Loading tape...</span>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <Search size={40} className="mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No finds match your search</p>
-            <p className="text-xs mt-1">Try different keywords or filters</p>
+            <p className="font-mono text-xs font-black uppercase">No tape entries match</p>
+            <p className="text-xs mt-1">Try another product, store, or market</p>
           </div>
         ) : (
           <div className="space-y-3">

@@ -87,9 +87,10 @@ export default function LocationSearch({ onSelect }: Props) {
   }
 
   return (
-    <div className="px-4 py-6">
-      <h2 className="text-2xl font-black text-black mb-1">Where did you find it?</h2>
-      <p className="text-sm text-gray-500 mb-4">Search for the store, bodega, or venue.</p>
+    <div className="px-0 py-2">
+      <p className="tape-label mb-2 text-link">Place Signal</p>
+      <h2 className="tape-title text-3xl mb-2">Where is the drop?</h2>
+      <p className="font-mono text-xs font-bold uppercase leading-5 text-gray-500 mb-4">Search OSM businesses, stores, bodegas, markets, and street-level venues.</p>
 
       <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -98,34 +99,34 @@ export default function LocationSearch({ onSelect }: Props) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search stores, bodegas, markets..."
-          className="w-full pl-9 pr-4 py-3 rounded-xl border border-[#E5E5E5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
+          className="w-full pl-9 pr-4 py-3 border border-gray-300 bg-white font-mono text-xs font-black uppercase focus:outline-none focus:border-black"
         />
       </div>
 
       <button
         onClick={handleLocate}
         disabled={locating}
-        className="flex items-center gap-2 text-sm text-link font-semibold mb-5"
+        className="flex items-center gap-2 tape-link mb-5"
       >
         {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
-        {locating ? 'Locating...' : 'Find stores near me'}
+        {locating ? 'Locating' : 'Grab nearby places'}
       </button>
 
       {loading && (
         <div className="flex items-center justify-center py-8 text-gray-400">
           <Loader2 className="w-5 h-5 animate-spin mr-2" />
-          <span className="text-sm">Searching...</span>
+          <span className="font-mono text-xs font-black uppercase">Searching places...</span>
         </div>
       )}
 
       {!loading && results.length === 0 && !query && (
-        <p className="text-center text-sm text-gray-400 py-8">
-          Allow location access or search for a store above.
+        <p className="text-center font-mono text-xs font-black uppercase text-gray-400 py-8">
+          Allow browser position or search above.
         </p>
       )}
 
       {!loading && results.length === 0 && query && (
-        <p className="text-center text-sm text-gray-400 py-8">No results for "{query}"</p>
+        <p className="text-center font-mono text-xs font-black uppercase text-gray-400 py-8">No tape places for "{query}"</p>
       )}
 
       <div className="space-y-2">
@@ -133,15 +134,15 @@ export default function LocationSearch({ onSelect }: Props) {
           <button
             key={loc.id}
             onClick={() => onSelect(loc)}
-            className="w-full flex items-start gap-3 bg-white rounded-2xl p-4 shadow-sm border border-[#E5E5E5] text-left hover:border-black transition-colors"
+            className="w-full flex items-start gap-3 tape-panel p-4 text-left hover:border-black transition-colors"
           >
-            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-9 h-9 border border-gray-300 bg-white flex items-center justify-center shrink-0 mt-0.5">
               <MapPin className="w-4 h-4 text-black" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-black text-sm truncate">{loc.placeName}</p>
-              <p className="text-xs text-gray-500 truncate">{loc.address}</p>
-              <p className="text-xs text-gray-500 capitalize mt-0.5">{loc.placeType}</p>
+              <p className="font-mono text-sm font-black uppercase text-black truncate">{loc.placeName}</p>
+              <p className="font-mono text-[10px] font-bold uppercase text-gray-500 truncate">{loc.address}</p>
+              <p className="font-mono text-[10px] font-bold uppercase text-gray-500 capitalize mt-0.5">{loc.placeType}</p>
             </div>
           </button>
         ))}

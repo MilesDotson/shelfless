@@ -74,10 +74,11 @@ export default function CreateRequest() {
 
     if (result) {
       setToast('Bid posted to the tape.');
+      setTimeout(() => navigate('/requests'), 1200);
     } else {
       setToast('Bid failed to sync. Try again.');
+      setSubmitting(false);
     }
-    setTimeout(() => navigate('/requests'), 2000);
   };
 
   return (
@@ -103,6 +104,7 @@ export default function CreateRequest() {
             Product <span className="text-red-400">*</span>
           </label>
           <input
+            aria-label="Product"
             type="text"
             value={form.productName}
             onChange={(e) => setField('productName', e.target.value)}
@@ -120,6 +122,7 @@ export default function CreateRequest() {
             Category <span className="text-red-400">*</span>
           </label>
           <select
+            aria-label="Category"
             value={form.category}
             onChange={(e) => setField('category', e.target.value)}
             className={`w-full border px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black bg-white ${
@@ -140,6 +143,7 @@ export default function CreateRequest() {
             Bid Notes <span className="text-red-400">*</span>
           </label>
           <textarea
+            aria-label="Bid Notes"
             value={form.description}
             onChange={(e) => setField('description', e.target.value)}
             placeholder="Brand, quantity, requirements..."
@@ -157,6 +161,7 @@ export default function CreateRequest() {
             Market Area <span className="text-red-400">*</span>
           </label>
           <input
+            aria-label="Market Area"
             type="text"
             value={form.searchArea}
             onChange={(e) => setField('searchArea', e.target.value)}
@@ -172,6 +177,7 @@ export default function CreateRequest() {
         <div>
           <label className="block tape-label mb-1.5">Condition</label>
           <select
+            aria-label="Condition"
             value={form.condition}
             onChange={(e) => setField('condition', e.target.value)}
             className="w-full border border-gray-300 px-3 py-3 font-mono text-xs font-black uppercase outline-none focus:border-black text-black bg-white"
@@ -189,6 +195,7 @@ export default function CreateRequest() {
             <div className="flex items-center border border-gray-300 px-3 py-3 bg-white">
               <span className="text-gray-400 mr-1 text-sm">$</span>
               <input
+                aria-label="Max Ask"
                 type="number"
                 value={form.maxPrice}
                 onChange={(e) => setField('maxPrice', e.target.value)}
@@ -204,6 +211,7 @@ export default function CreateRequest() {
             <div className="flex items-center border border-gray-300 px-3 py-3 bg-white">
               <span className="text-gray-400 mr-1 text-sm">$</span>
               <input
+                aria-label="Bounty"
                 type="number"
                 value={form.reward}
                 onChange={(e) => setField('reward', e.target.value)}
@@ -243,6 +251,7 @@ export default function CreateRequest() {
             Expires <span className="text-red-400">*</span>
           </label>
           <input
+            aria-label="Expires"
             type="date"
             value={form.expiresAt}
             onChange={(e) => setField('expiresAt', e.target.value)}

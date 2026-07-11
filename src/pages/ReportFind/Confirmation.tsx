@@ -40,9 +40,16 @@ export default function Confirmation({ state, onEditLocation, onEditProduct, onD
       })
     );
 
-    await Promise.all(createPromises);
+    const results = await Promise.all(createPromises);
+    const savedCount = results.filter(Boolean).length;
+    setSaving(false);
 
-    setToast(`${state.products.length} find${state.products.length > 1 ? 's' : ''} saved! Thanks for helping the community.`);
+    if (savedCount !== state.products.length) {
+      setToast(`Only ${savedCount}/${state.products.length} drops published. Check connection and retry.`);
+      return;
+    }
+
+    setToast(`${state.products.length} drop${state.products.length > 1 ? 's' : ''} published to the tape.`);
     setTimeout(() => {
       navigate('/feed');
     }, 2000);

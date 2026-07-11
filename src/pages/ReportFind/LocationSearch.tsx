@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { MapPin, Search, Loader2, Navigation } from 'lucide-react'
-import { searchLocations, fetchNearbyBusinesses, overpassElementToLocation, formatAddress, NominatimResult } from '../../utils/geo'
+import { searchLocations, fetchNearbyBusinesses, overpassElementToLocation, formatAddress, NominatimResult, fallbackBusinessesForArea, geocodeArea } from '../../utils/geo'
 import { Location } from '../../types'
 import { useLocation as useAppLocation } from '../../context/LocationContext'
 
@@ -27,7 +27,7 @@ export default function LocationSearch({ onSelect }: Props) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Use shared location context — already fetched on app load
-  const { coords } = useAppLocation()
+  const { coords, locationName, resolveTypedLocation } = useAppLocation()
   const userPos = useMemo(
     () => (coords ? { lat: coords.lat, lon: coords.lon } : null),
     [coords?.lat, coords?.lon]
@@ -35,18 +35,43 @@ export default function LocationSearch({ onSelect }: Props) {
 
   // Load nearby businesses when we have position and no query
   useEffect(() => {
-    if (!userPos || query) return
-    setLoading(true)
-    fetchNearbyBusinesses(userPos.lat, userPos.lon, 1000)
-      .then(els => setResults(els.map(overpassElementToLocation) as Location[]))
-      .catch(() => setResults([]))
-      .finally(() => setLoading(false))
-  }, [userPos])
+    if (query) return
+
+    const loadNearby = async () => {
+      let position = userPos
+      if (!position && locationName.trim()) {
+        const geocoded = await geocodeArea(locationName).catch(() => null)
+        if (geocoded) {
+          position = { lat: parseFloat(geocoded.lat), lon: parseFloat(geocoded.lon) }
+        }
+      }
+
+      if (!position) {
+        const fallback = fallbackBusinessesForArea(locationName)
+        setResults(fallback.map(overpassElementToLocation) as Location[])
+        return
+      }
+
+      setLoading(true)
+      try {
+        const els = await fetchNearbyBusinesses(position.lat, position.lon, 1000)
+        const mapped = els.map(overpassElementToLocation) as Location[]
+        const fallback = fallbackBusinessesForArea(locationName).map(overpassElementToLocation) as Location[]
+        setResults(mapped.length > 0 ? mapped : fallback)
+      } catch {
+        setResults(fallbackBusinessesForArea(locationName).map(overpassElementToLocation) as Location[])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadNearby()
+  }, [userPos, locationName, query])
 
   // Search as user types
   useEffect(() => {
     if (!query.trim()) {
-      if (userPos) return // let the nearby effect handle it
+      if (userPos || locationName.trim()) return // let the nearby effect handle it
       setResults([])
       return
     }
@@ -63,10 +88,15 @@ export default function LocationSearch({ onSelect }: Props) {
       }
     }, 400)
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
-  }, [query, userPos])
+  }, [query, userPos, locationName])
 
   const handleLocate = () => {
-    if (!navigator.geolocation) return
+    if (!navigator.geolocation || !window.isSecureContext) {
+      resolveTypedLocation()
+      const fallback = fallbackBusinessesForArea(locationName)
+      if (fallback.length) setResults(fallback.map(overpassElementToLocation) as Location[])
+      return
+    }
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
       async pos => {
@@ -77,7 +107,7 @@ export default function LocationSearch({ onSelect }: Props) {
           const els = await fetchNearbyBusinesses(lat, lon, 1000)
           setResults(els.map(overpassElementToLocation) as Location[])
         } catch {
-          setResults([])
+          setResults(fallbackBusinessesForArea(locationName).map(overpassElementToLocation) as Location[])
         } finally {
           setLoading(false)
         }

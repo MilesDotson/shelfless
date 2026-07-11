@@ -34,7 +34,7 @@ function tickerId(index: number) {
 
 export default function DesktopHome() {
   const navigate = useNavigate();
-  const { locationName, setLocationName, locating, requestLocation } = useLocation();
+  const { locationName, setLocationName, locating, locationError, requestLocation } = useLocation();
   const [finds, setFinds] = useState<Find[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,8 +218,11 @@ export default function DesktopHome() {
                 className="mt-3 flex items-center gap-2 font-mono text-xs font-black uppercase text-link disabled:opacity-50"
               >
                 {locating ? <Loader2 size={14} className="animate-spin" /> : <LocateFixed size={14} />}
-                {locating ? 'Getting Position' : 'Grab Browser Position'}
+                {locating ? 'Resolving Position' : 'Set / Grab Position'}
               </button>
+              {locationError && (
+                <p className="mt-2 font-mono text-[10px] font-black uppercase leading-4 text-red-500">{locationError}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-3 border-b border-gray-300 bg-white">

@@ -20,7 +20,7 @@ const trendingIcons = [Package, ShoppingBag, Droplets, Baby, Zap, Wind];
 
 export default function Home() {
   const navigate = useNavigate();
-  const { locationName, setLocationName, locating, requestLocation } = useLocation();
+  const { locationName, setLocationName, locating, locationError, requestLocation } = useLocation();
 
   const handleGetStarted = () => {
     navigate('/feed', { state: { location: locationName } });
@@ -64,8 +64,11 @@ export default function Home() {
           className="mt-3 flex items-center gap-2 tape-link disabled:opacity-50"
         >
           {locating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
-          {locating ? 'Getting Position' : 'Grab Browser Position'}
+          {locating ? 'Resolving Position' : 'Set / Grab Position'}
         </button>
+        {locationError && (
+          <p className="mt-2 font-mono text-[10px] font-black uppercase leading-4 text-red-500">{locationError}</p>
+        )}
       </div>
 
       {/* CTA button */}

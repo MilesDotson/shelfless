@@ -89,7 +89,7 @@ const now = new Date();
 const hoursAgo = (h: number) => new Date(now.getTime() - h * 60 * 60 * 1000).toISOString();
 const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000).toISOString();
 
-export const mockFinds: Find[] = [
+const baseMockFinds: Find[] = [
   {
     id: 'f1',
     product: mockProducts[0],
@@ -222,7 +222,7 @@ export const mockFinds: Find[] = [
 
 const daysFromNow = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000).toISOString();
 
-export const mockRequests: Request[] = [
+const baseMockRequests: Request[] = [
   {
     id: 'r1',
     requesterUserId: 'u7',
@@ -309,3 +309,102 @@ export const mockRequests: Request[] = [
     responseCount: 3,
   },
 ];
+
+const oaklandLocations: Location[] = [
+  { id: 'loc9', placeName: 'Swan Market', address: '510 9th St, Oakland, CA 94607', lat: 37.8017, lng: -122.2742, placeType: 'marketplace' },
+  { id: 'loc10', placeName: 'Temescal Corner', address: '4919 Telegraph Ave, Oakland, CA 94609', lat: 37.8361, lng: -122.2626, placeType: 'bodega' },
+  { id: 'loc11', placeName: 'Grand Lake Pharmacy', address: '3250 Grand Ave, Oakland, CA 94610', lat: 37.8111, lng: -122.2473, placeType: 'store' },
+  { id: 'loc12', placeName: 'Fruitvale Mini Mart', address: '3301 E 12th St, Oakland, CA 94601', lat: 37.7758, lng: -122.2241, placeType: 'bodega' },
+  { id: 'loc13', placeName: 'Rockridge Estate Sale', address: 'College Ave & Alcatraz Ave, Oakland, CA 94618', lat: 37.8495, lng: -122.2521, placeType: 'estate sale' },
+  { id: 'loc14', placeName: 'West Oakland Pop-Up', address: 'Mandela Pkwy & 14th St, Oakland, CA 94607', lat: 37.8118, lng: -122.2884, placeType: 'pop-up' },
+  { id: 'loc15', placeName: 'Lake Merritt Market', address: 'Lakeshore Ave, Oakland, CA 94610', lat: 37.8079, lng: -122.2437, placeType: 'flea market' },
+  { id: 'loc16', placeName: 'Piedmont Grocery', address: '4038 Piedmont Ave, Oakland, CA 94611', lat: 37.8267, lng: -122.2525, placeType: 'store' },
+];
+
+const extraProducts: Product[] = [
+  { id: 'p16', name: 'Portable Power Bank', category: 'Electronics' },
+  { id: 'p17', name: 'Trader Joe\'s Tote Bag', category: 'Home Goods' },
+  { id: 'p18', name: 'Ceramic Space Heater', category: 'Home Goods' },
+  { id: 'p19', name: 'Dr. Bronner\'s Soap', category: 'Beauty' },
+  { id: 'p20', name: 'Organic Eggs (dozen)', category: 'Food & Grocery' },
+  { id: 'p21', name: 'Laundry Detergent Pods', category: 'Cleaning' },
+  { id: 'p22', name: 'Used Road Bike', category: 'Sporting Goods' },
+  { id: 'p23', name: 'Cast Iron Skillet', category: 'Kitchen Appliances' },
+  { id: 'p24', name: 'Sony WH-1000XM4 Headphones', category: 'Electronics' },
+  { id: 'p25', name: 'Aesop Hand Wash', category: 'Beauty' },
+  { id: 'p26', name: 'HEPA Air Purifier', category: 'Home Goods' },
+  { id: 'p27', name: 'Kids Tylenol', category: 'Health' },
+  { id: 'p28', name: 'Moving Boxes (bundle)', category: 'Home Goods' },
+  { id: 'p29', name: 'KitchenAid Mixer', category: 'Kitchen Appliances' },
+  { id: 'p30', name: 'Vintage Area Rug', category: 'Home Goods' },
+];
+
+mockLocations.push(...oaklandLocations);
+mockProducts.push(...extraProducts);
+
+const allLocations = mockLocations;
+const allProducts = mockProducts;
+
+const generatedFinds: Find[] = [
+  ['f9', 15, 8, 'Full Stock', 19.99, 'ANKER 10K UNITS BEHIND COUNTER. ASK CASHIER.', 'store', 1.4, 'Photo Verified', 6],
+  ['f10', 16, 9, 'Medium Stock', 12.00, 'CANVAS TOTES NEAR FRONT DOOR. BLACK LOGO.', 'bodega', 1.8, 'Recently Confirmed', 3],
+  ['f11', 17, 10, 'Low Stock', 34.50, 'TWO HEATERS LEFT IN SEASONAL AISLE.', 'store', 2.5, 'Community Confirmed', 8],
+  ['f12', 18, 11, 'Full Stock', 8.99, 'PEPPERMINT AND UNSCENTED. RESTOCKED THIS MORNING.', 'bodega', 2.9, 'Photo Verified', 5],
+  ['f13', 19, 15, 'Medium Stock', 7.49, 'LOCAL EGGS IN BACK COOLER.', 'store', 3.2, 'Unverified', 1],
+  ['f14', 20, 12, 'Full Stock', 17.99, 'TIDE PODS 42CT STACKED BY REGISTER.', 'bodega', 3.7, 'Recently Confirmed', 9],
+  ['f15', 21, 13, 'Low Stock', 180.00, 'STEEL FRAME ROAD BIKE. NEEDS NEW TUBE.', 'estate sale', 4.2, 'Photo Verified', 4],
+  ['f16', 22, 14, 'Full Stock', 22.00, 'LODGE 10-INCH SKILLETS AT POP-UP TABLE.', 'pop-up', 4.8, 'Community Confirmed', 2],
+  ['f17', 23, 8, 'Medium Stock', 149.00, 'USED SONY HEADPHONES. CASE INCLUDED.', 'flea market', 5.5, 'Unverified', 0],
+  ['f18', 24, 9, 'Low Stock', 39.00, 'ONE AROMATIQUE HAND WASH LEFT.', 'bodega', 6.1, 'Recently Confirmed', 2],
+  ['f19', 25, 10, 'Full Stock', 89.99, 'LEVOIT PURIFIERS ON END CAP.', 'store', 6.8, 'Photo Verified', 7],
+  ['f20', 26, 11, 'Medium Stock', 11.49, 'KIDS LIQUID TYLENOL BEHIND COUNTER.', 'bodega', 7.3, 'Recently Confirmed', 10],
+  ['f21', 27, 12, 'Full Stock', 18.00, 'TWENTY-BOX BUNDLES. GOOD FOR MOVING.', 'bodega', 8.2, 'Unverified', 1],
+  ['f22', 28, 13, 'Low Stock', 140.00, 'OLDER MIXER WORKS. MISSING SPLASH GUARD.', 'estate sale', 9.5, 'Photo Verified', 3],
+  ['f23', 29, 14, 'Medium Stock', 95.00, 'HAND-KNOTTED STYLE RUGS IN TWO SIZES.', 'flea market', 10.5, 'Community Confirmed', 6],
+  ['f24', 12, 15, 'Full Stock', 15.99, '3-PACK N95. SHELF NEAR CHECKOUT.', 'store', 11.3, 'Recently Confirmed', 12],
+].map(([id, productIdx, locationIdx, stockStatus, price, notes, sourceType, hours, verificationStatus, confirmations]) => ({
+  id: String(id),
+  product: allProducts[Number(productIdx)],
+  location: allLocations[Number(locationIdx)],
+  reporterUserId: 'seed',
+  reporterName: ['Mina K.', 'Theo S.', 'Jules P.', 'Rae C.'][Number(productIdx) % 4],
+  stockStatus: stockStatus as Find['stockStatus'],
+  price: Number(price),
+  notes: String(notes),
+  photos: [],
+  sourceType: sourceType as Find['sourceType'],
+  createdAt: hoursAgo(Number(hours)),
+  verificationStatus: verificationStatus as Find['verificationStatus'],
+  confirmations: Number(confirmations),
+  saved: false,
+}));
+
+const generatedRequests: Request[] = [
+  ['r6', 'Portable Power Bank 20K+', 'Electronics', 'Need one before travel. USB-C required.', 'Downtown Oakland / Jack London', 45, 8, 'High', 'used', 1.2, 4],
+  ['r7', 'Kids Tylenol', 'Health', 'Sealed bottle only. Any flavor.', 'Oakland / Alameda', 18, 5, 'ASAP', 'sealed', 2.1, 2],
+  ['r8', 'Cast Iron Skillet', 'Kitchen Appliances', 'Looking for Lodge or similar, 10 inch minimum.', 'Temescal / Rockridge', 35, 6, 'Medium', 'used', 5.4, 1],
+  ['r9', 'Moving Boxes', 'Home Goods', 'Need clean medium boxes this weekend.', 'West Oakland', 25, 4, 'High', 'any', 7.1, 6],
+  ['r10', 'HEPA Air Purifier', 'Home Goods', 'Need a working unit for small bedroom.', 'Grand Lake / Adams Point', 120, 12, 'Medium', 'any', 9.2, 3],
+  ['r11', 'Laundry Detergent Pods', 'Cleaning', 'Bulk tub preferred. Any brand.', 'Fruitvale / San Antonio', 22, 3, 'Low', 'new', 12.5, 0],
+  ['r12', 'Vintage Area Rug', 'Home Goods', 'Looking for 5x7 or bigger. Neutral colors.', 'Oakland estate sales', 150, 20, 'Low', 'vintage', 18, 1],
+  ['r13', 'Aesop Hand Wash', 'Beauty', 'Trying to find discounted or lightly used refill.', 'Anywhere East Bay', 45, 8, 'Low', 'any', 20, 0],
+].map(([id, productName, category, description, searchArea, maxPrice, reward, urgency, condition, hours, responseCount]) => ({
+  id: String(id),
+  requesterUserId: 'seed',
+  requesterName: ['Nia R.', 'Owen L.', 'Cam D.', 'Priya S.'][Number(responseCount) % 4],
+  productName: String(productName),
+  category: String(category),
+  description: String(description),
+  searchArea: String(searchArea),
+  maxPrice: Number(maxPrice),
+  reward: Number(reward),
+  urgency: urgency as Request['urgency'],
+  condition: condition as Request['condition'],
+  status: 'open',
+  createdAt: hoursAgo(Number(hours)),
+  expiresAt: daysFromNow(8 + (Number(responseCount) % 5)),
+  responseCount: Number(responseCount),
+}));
+
+export const mockFinds: Find[] = [...baseMockFinds, ...generatedFinds];
+export const mockRequests: Request[] = [...baseMockRequests, ...generatedRequests];

@@ -1,64 +1,141 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { reverseGeocode } from '../utils/geo'
+import { geocodeArea, reverseGeocode } from '../utils/geo'
+
+const LOCATION_STORAGE_KEY = 'shelfless_location'
 
 interface LocationContextValue {
   coords: { lat: number; lon: number } | null
   locationName: string
   locating: boolean
+  locationError: string
   setLocationName: (name: string) => void
-  requestLocation: () => void
+  requestLocation: () => Promise<void>
+  resolveTypedLocation: () => Promise<void>
 }
 
 const LocationContext = createContext<LocationContextValue>({
   coords: null,
   locationName: '',
   locating: false,
+  locationError: '',
   setLocationName: () => {},
-  requestLocation: () => {},
+  requestLocation: async () => {},
+  resolveTypedLocation: async () => {},
 })
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null)
-  const [locationName, setLocationName] = useState('')
+  const storedLocation = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(LOCATION_STORAGE_KEY) || 'null') as { locationName?: string; coords?: { lat: number; lon: number } } | null
+    } catch {
+      return null
+    }
+  })()
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(storedLocation?.coords ?? null)
+  const [locationName, setLocationNameState] = useState(storedLocation?.locationName ?? '')
   const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState('')
 
-  const requestLocation = () => {
-    if (!navigator.geolocation || locating) return
+  const saveLocation = (name: string, nextCoords: { lat: number; lon: number } | null = coords) => {
+    localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify({ locationName: name, coords: nextCoords }))
+  }
+
+  const setLocationName = (name: string) => {
+    setLocationNameState(name)
+    saveLocation(name)
+  }
+
+  const setResolvedLocation = (name: string, nextCoords: { lat: number; lon: number }) => {
+    setCoords(nextCoords)
+    setLocationNameState(name)
+    saveLocation(name, nextCoords)
+  }
+
+  const resolveTypedLocation = async () => {
+    if (!locationName.trim() || locating) return
     setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      async pos => {
-        const { latitude: lat, longitude: lon } = pos.coords
-        setCoords({ lat, lon })
-        try {
-          const result = await reverseGeocode(lat, lon)
-          if (result) {
-            const name =
-              result.address?.suburb ||
-              result.address?.city ||
-              result.address?.town ||
-              result.address?.state ||
-              'Your Area'
-            setLocationName(name)
+    setLocationError('')
+    try {
+      const result = await geocodeArea(locationName)
+      if (!result) {
+        setLocationError('Could not locate that area. Try a city or neighborhood.')
+        return
+      }
+
+      const lat = parseFloat(result.lat)
+      const lon = parseFloat(result.lon)
+      const name =
+        result.address?.suburb ||
+        result.address?.city ||
+        result.address?.town ||
+        result.name ||
+        locationName
+      setResolvedLocation(name, { lat, lon })
+    } catch {
+      setLocationError('Location lookup failed. Using typed area only.')
+    } finally {
+      setLocating(false)
+    }
+  }
+
+  const requestLocation = async () => {
+    if (locating) return
+    if (!navigator.geolocation || !window.isSecureContext) {
+      if (locationName.trim()) {
+        await resolveTypedLocation()
+      } else {
+        setLocationError('Browser GPS needs HTTPS. Type a city or neighborhood instead.')
+      }
+      return
+    }
+
+    setLocating(true)
+    setLocationError('')
+    await new Promise<void>((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        async pos => {
+          const { latitude: lat, longitude: lon } = pos.coords
+          const nextCoords = { lat, lon }
+          try {
+            const result = await reverseGeocode(lat, lon)
+            if (result) {
+              const name =
+                result.address?.suburb ||
+                result.address?.city ||
+                result.address?.town ||
+                result.address?.state ||
+                'Your Area'
+              setResolvedLocation(name, nextCoords)
+            } else {
+              setResolvedLocation('Your Area', nextCoords)
+            }
+          } catch {
+            setResolvedLocation('Your Area', nextCoords)
           }
-        } catch {
-          setLocationName('Your Area')
-        }
-        setLocating(false)
-      },
-      () => {
-        setLocating(false)
-      },
-      { timeout: 8000 }
-    )
+          setLocating(false)
+          resolve()
+        },
+        async () => {
+          setLocating(false)
+          if (locationName.trim()) {
+            await resolveTypedLocation()
+          } else {
+            setLocationError('Browser GPS denied. Type a city or neighborhood instead.')
+          }
+          resolve()
+        },
+        { timeout: 8000, enableHighAccuracy: false }
+      )
+    })
   }
 
   // Auto-request on mount
   useEffect(() => {
-    requestLocation()
+    if (window.isSecureContext) requestLocation()
   }, [])
 
   return (
-    <LocationContext.Provider value={{ coords, locationName, locating, setLocationName, requestLocation }}>
+    <LocationContext.Provider value={{ coords, locationName, locating, locationError, setLocationName, requestLocation, resolveTypedLocation }}>
       {children}
     </LocationContext.Provider>
   )

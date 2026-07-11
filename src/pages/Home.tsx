@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { mockRequests } from '../data/mockData';
 import { useLocation } from '../context/LocationContext';
+import DesktopHome from './DesktopHome';
 
 const trendingIcons = [Package, ShoppingBag, Droplets, Baby, Zap, Wind];
 
@@ -28,7 +29,9 @@ export default function Home() {
   const trendingItems = mockRequests.slice(0, 6);
 
   return (
-    <div className="px-4 py-6">
+    <>
+    <DesktopHome />
+    <div className="px-4 py-6 lg:hidden">
       {/* Hero */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-black leading-tight mb-2">
@@ -126,5 +129,6 @@ export default function Home() {
         </button>
       </div>
     </div>
+    </>
   );
 }

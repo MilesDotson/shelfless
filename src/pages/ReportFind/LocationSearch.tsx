@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { MapPin, Search, Loader2, Navigation } from 'lucide-react'
 import { searchLocations, fetchNearbyBusinesses, overpassElementToLocation, formatAddress, NominatimResult } from '../../utils/geo'
 import { Location } from '../../types'
@@ -28,7 +28,10 @@ export default function LocationSearch({ onSelect }: Props) {
 
   // Use shared location context — already fetched on app load
   const { coords } = useAppLocation()
-  const userPos = coords ? { lat: coords.lat, lon: coords.lon } : null
+  const userPos = useMemo(
+    () => (coords ? { lat: coords.lat, lon: coords.lon } : null),
+    [coords?.lat, coords?.lon]
+  )
 
   // Load nearby businesses when we have position and no query
   useEffect(() => {

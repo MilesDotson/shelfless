@@ -2,31 +2,35 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowUpRight,
-  Boxes,
-  Clock,
   Loader2,
+  LocateFixed,
   MapPin,
-  Navigation,
   PackagePlus,
   Search,
   ShoppingBag,
-  Sparkles,
 } from 'lucide-react';
-import FindCard from '../components/FindCard';
-import RequestCard from '../components/RequestCard';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useLocation } from '../context/LocationContext';
 import { getFinds, getRequests } from '../lib/dataService';
-import { Find, Request } from '../types';
+import { Find, Request, StockStatus } from '../types';
 import { timeAgo } from '../utils/time';
 
-const explorePrompts = [
-  'Paper towels',
-  'Baby formula',
-  'Vintage lamps',
-  'Disinfectant wipes',
-  'Sneakers',
-];
+const explorePrompts = ['paper towels', 'baby formula', 'vintage lamp', 'sneakers', 'wipes'];
+
+const stockSignal: Record<StockStatus, { label: string; code: string; color: string }> = {
+  'Full Stock': { label: 'FULL', code: '+92', color: 'text-link' },
+  'Medium Stock': { label: 'MED', code: '+43', color: 'text-link' },
+  'Low Stock': { label: 'LOW', code: '-18', color: 'text-gray-500' },
+  'Out of Stock': { label: 'OUT', code: '-100', color: 'text-red-500' },
+  Unknown: { label: 'UNK', code: '---', color: 'text-gray-400' },
+};
+
+type TickerItem =
+  | { kind: 'find'; sortDate: string; find: Find }
+  | { kind: 'request'; sortDate: string; request: Request };
+
+function tickerId(index: number) {
+  return String(index + 1).padStart(3, '0');
+}
 
 export default function DesktopHome() {
   const navigate = useNavigate();
@@ -34,8 +38,7 @@ export default function DesktopHome() {
   const [finds, setFinds] = useState<Find[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [savedIds, setSavedIds] = useLocalStorage<string[]>('shelfless_saved_finds', []);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -43,7 +46,7 @@ export default function DesktopHome() {
     Promise.all([getFinds(), getRequests()])
       .then(([findData, requestData]) => {
         if (!active) return;
-        setFinds(findData.map((find) => ({ ...find, saved: savedIds.includes(find.id) })));
+        setFinds(findData);
         setRequests(requestData);
       })
       .finally(() => {
@@ -53,218 +56,236 @@ export default function DesktopHome() {
     return () => {
       active = false;
     };
-    // savedIds is intentionally applied on initial dashboard load. Card toggles update local state below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filteredFinds = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return finds;
+  const tickerItems = useMemo<TickerItem[]>(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    const items: TickerItem[] = [
+      ...finds.map((find) => ({ kind: 'find' as const, sortDate: find.createdAt, find })),
+      ...requests
+        .filter((request) => request.status === 'open')
+        .map((request) => ({ kind: 'request' as const, sortDate: request.createdAt, request })),
+    ];
 
-    return finds.filter((find) =>
-      [
-        find.product.name,
-        find.product.category,
-        find.location.placeName,
-        find.location.address,
-        find.sourceType,
-      ].some((value) => value.toLowerCase().includes(q))
-    );
-  }, [finds, search]);
+    return items
+      .filter((item) => {
+        if (!normalizedQuery) return true;
+        if (item.kind === 'find') {
+          return [
+            item.find.product.name,
+            item.find.product.category,
+            item.find.location.placeName,
+            item.find.location.address,
+            item.find.stockStatus,
+          ].some((value) => value.toLowerCase().includes(normalizedQuery));
+        }
 
-  const libraryStats = useMemo(() => {
-    const uniqueProducts = new Set(finds.map((find) => find.product.name.toLowerCase())).size;
-    const liveLocations = new Set(finds.map((find) => find.location.placeName.toLowerCase())).size;
-    const confirmed = finds.filter((find) =>
-      ['Photo Verified', 'Recently Confirmed', 'Community Confirmed'].includes(find.verificationStatus)
-    ).length;
+        return [
+          item.request.productName,
+          item.request.category,
+          item.request.searchArea,
+          item.request.description,
+        ].some((value) => value.toLowerCase().includes(normalizedQuery));
+      })
+      .sort((a, b) => new Date(b.sortDate).getTime() - new Date(a.sortDate).getTime());
+  }, [finds, query, requests]);
 
-    return { uniqueProducts, liveLocations, confirmed };
-  }, [finds]);
-
-  const recentFinds = filteredFinds.slice(0, 8);
-  const activeRequests = requests.filter((request) => request.status === 'open').slice(0, 3);
-
-  const handleToggleSave = (id: string) => {
-    setSavedIds((prev) =>
-      prev.includes(id) ? prev.filter((savedId) => savedId !== id) : [...prev, id]
-    );
-    setFinds((prev) => prev.map((find) => (find.id === id ? { ...find, saved: !find.saved } : find)));
-  };
+  const stats = useMemo(() => {
+    const locations = new Set(finds.map((find) => find.location.placeName.toLowerCase())).size;
+    const products = new Set(finds.map((find) => find.product.name.toLowerCase())).size;
+    const openRequests = requests.filter((request) => request.status === 'open').length;
+    return { locations, products, openRequests };
+  }, [finds, requests]);
 
   return (
-    <div className="hidden lg:block px-8 py-8">
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)] gap-6">
-        <section className="min-w-0">
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-link">
-                <Boxes size={15} />
-                Product Library
-              </p>
-              <h1 className="text-4xl font-black leading-tight text-black">New products added nearby</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-                Live ShelfLess submissions from stores, bodegas, garage sales, and community spots.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/feed')}
-              className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-black hover:border-black"
-            >
-              Full feed
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
-          <div className="mb-5 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Products</p>
-              <p className="mt-2 text-3xl font-black text-black">{libraryStats.uniqueProducts}</p>
-            </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Locations</p>
-              <p className="mt-2 text-3xl font-black text-black">{libraryStats.liveLocations}</p>
-            </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Confirmed</p>
-              <p className="mt-2 text-3xl font-black text-black">{libraryStats.confirmed}</p>
+    <div className="hidden lg:block min-h-[calc(100vh-57px)] bg-[#F5F5F5] text-black">
+      <div className="grid min-h-[calc(100vh-57px)] grid-cols-[minmax(0,1fr)_390px] border-t border-gray-200">
+        <section className="min-w-0 border-r border-gray-300 bg-white">
+          <div className="sticky top-[57px] z-20 border-b border-black bg-white">
+            <div className="grid grid-cols-[88px_minmax(0,1fr)_150px_120px_100px] items-end gap-4 px-5 py-4">
+              <div className="font-mono text-xs font-bold uppercase text-gray-400">Index</div>
+              <div>
+                <h1 className="text-[44px] font-black uppercase leading-none tracking-normal">ShelfLess Tape</h1>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wide text-gray-500">
+                  Live product library / community demand / neighborhood stock
+                </p>
+              </div>
+              <div className="text-right font-mono text-xs font-bold uppercase text-gray-400">Market</div>
+              <div className="text-right font-mono text-xs font-bold uppercase text-gray-400">Signal</div>
+              <div className="text-right font-mono text-xs font-bold uppercase text-gray-400">Age</div>
             </div>
           </div>
 
-          <div className="mb-4 flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3">
-            <Search size={18} className="text-gray-400" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Filter library by product, store, category, or neighborhood..."
-              className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder-gray-400"
-            />
+          <div className="border-b border-gray-300 bg-[#F5F5F5] px-5 py-3">
+            <div className="flex items-center gap-3">
+              <Search size={16} className="text-gray-500" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="SEARCH THE TAPE: product, store, request, neighborhood"
+                className="min-w-0 flex-1 bg-transparent font-mono text-sm font-bold uppercase text-black outline-none placeholder-gray-400"
+              />
+              <button onClick={() => navigate('/feed')} className="text-xs font-black uppercase text-link">
+                Full Feed <ArrowUpRight className="inline" size={13} />
+              </button>
+            </div>
           </div>
 
           {loading ? (
-            <div className="flex h-80 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-400">
-              <Loader2 className="mr-2 animate-spin" size={22} />
-              Loading library activity...
+            <div className="flex h-[520px] items-center justify-center font-mono text-sm font-bold uppercase text-gray-400">
+              <Loader2 className="mr-2 animate-spin" size={18} />
+              Loading Tape
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {recentFinds.map((find) => (
-                <FindCard key={find.id} find={find} onToggleSave={handleToggleSave} />
-              ))}
+            <div>
+              {tickerItems.map((item, index) => {
+                if (item.kind === 'request') {
+                  const request = item.request;
+                  return (
+                    <button
+                      key={`request-${request.id}`}
+                      onClick={() => navigate('/requests')}
+                      className="grid w-full grid-cols-[88px_minmax(0,1fr)_150px_120px_100px] items-center gap-4 border-b border-gray-300 px-5 py-4 text-left transition-colors hover:bg-black hover:text-white"
+                    >
+                      <span className="font-mono text-sm font-black text-gray-400">#{tickerId(index)}</span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-2xl font-black uppercase leading-none">{request.productName}</span>
+                        <span className="mt-1 block truncate font-mono text-xs font-bold uppercase text-gray-500">
+                          BID / {request.searchArea || 'ANYWHERE'} / {request.category}
+                        </span>
+                      </span>
+                      <span className="text-right font-mono text-sm font-black uppercase">
+                        {request.reward ? `$${request.reward.toFixed(0)} REWARD` : 'OPEN REQ'}
+                      </span>
+                      <span className="text-right font-mono text-sm font-black uppercase text-link">{request.urgency}</span>
+                      <span className="text-right font-mono text-xs font-bold uppercase text-gray-500">{timeAgo(request.createdAt)}</span>
+                    </button>
+                  );
+                }
+
+                const find = item.find;
+                const signal = stockSignal[find.stockStatus];
+                return (
+                  <button
+                    key={`find-${find.id}`}
+                    onClick={() => navigate(`/find/${find.id}`)}
+                    className="grid w-full grid-cols-[88px_minmax(0,1fr)_150px_120px_100px] items-center gap-4 border-b border-gray-300 px-5 py-4 text-left transition-colors hover:bg-black hover:text-white"
+                  >
+                    <span className="font-mono text-sm font-black text-gray-400">#{tickerId(index)}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-2xl font-black uppercase leading-none">{find.product.name}</span>
+                      <span className="mt-1 block truncate font-mono text-xs font-bold uppercase text-gray-500">
+                        {find.location.placeName} / {find.product.category} / {find.sourceType}
+                      </span>
+                    </span>
+                    <span className="text-right font-mono text-sm font-black uppercase">
+                      {find.price === undefined ? 'ASK --' : `$${find.price.toFixed(2)}`}
+                    </span>
+                    <span className={`text-right font-mono text-sm font-black uppercase ${signal.color}`}>
+                      {signal.label} {signal.code}
+                    </span>
+                    <span className="text-right font-mono text-xs font-bold uppercase text-gray-500">{timeAgo(find.createdAt)}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </section>
 
-        <aside className="min-w-0">
-          <div className="sticky top-[88px] space-y-4">
-            <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
-                  <p className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-link">
-                    <Sparkles size={15} />
-                    ShelfLess Explore
-                  </p>
-                  <h2 className="text-2xl font-black leading-tight text-black">Explore and add a find</h2>
-                </div>
-                <div className="rounded-2xl bg-gray-100 p-3">
-                  <PackagePlus size={24} className="text-black" />
-                </div>
-              </div>
+        <aside className="min-w-0 bg-[#F5F5F5]">
+          <div className="sticky top-[57px] min-h-[calc(100vh-57px)] border-l border-white">
+            <div className="border-b border-black bg-white px-5 py-5">
+              <p className="font-mono text-xs font-black uppercase tracking-wide text-link">Explore / Add Tool</p>
+              <h2 className="mt-2 text-4xl font-black uppercase leading-none tracking-normal">
+                Find what big-box search misses.
+              </h2>
+            </div>
 
-              <div className="mb-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Current area</p>
-                <div className="flex items-center gap-2">
-                  <MapPin size={18} className="shrink-0 text-black" />
-                  <input
-                    value={locationName}
-                    onChange={(event) => setLocationName(event.target.value)}
-                    placeholder="Enter a city or neighborhood"
-                    className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-black outline-none placeholder-gray-400"
-                  />
-                </div>
-                <button
-                  onClick={requestLocation}
-                  disabled={locating}
-                  className="mt-3 flex items-center gap-2 text-xs font-bold text-link disabled:opacity-50"
-                >
-                  {locating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
-                  {locating ? 'Getting browser location...' : 'Use browser location'}
-                </button>
+            <div className="border-b border-gray-300 px-5 py-4">
+              <p className="mb-2 font-mono text-xs font-black uppercase text-gray-500">Browser Location</p>
+              <div className="flex items-center gap-2 border border-gray-300 bg-white px-3 py-3">
+                <MapPin size={16} className="shrink-0 text-black" />
+                <input
+                  value={locationName}
+                  onChange={(event) => setLocationName(event.target.value)}
+                  placeholder="NEIGHBORHOOD OR CITY"
+                  className="min-w-0 flex-1 bg-transparent font-mono text-sm font-bold uppercase text-black outline-none placeholder-gray-400"
+                />
               </div>
+              <button
+                onClick={requestLocation}
+                disabled={locating}
+                className="mt-3 flex items-center gap-2 font-mono text-xs font-black uppercase text-link disabled:opacity-50"
+              >
+                {locating ? <Loader2 size={14} className="animate-spin" /> : <LocateFixed size={14} />}
+                {locating ? 'Getting Position' : 'Grab Browser Position'}
+              </button>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => navigate('/report')}
-                  className="rounded-2xl bg-black p-4 text-left text-white transition-colors hover:bg-gray-900"
-                >
-                  <PackagePlus size={22} />
-                  <span className="mt-4 block text-sm font-black">Add product</span>
-                  <span className="mt-1 block text-xs text-gray-300">Report shelf, sale, or store stock</span>
-                </button>
-                <button
-                  onClick={() => navigate('/requests/new')}
-                  className="rounded-2xl border border-gray-200 bg-white p-4 text-left text-black transition-colors hover:border-black"
-                >
-                  <ShoppingBag size={22} />
-                  <span className="mt-4 block text-sm font-black">Post request</span>
-                  <span className="mt-1 block text-xs text-gray-500">Ask the community to hunt</span>
-                </button>
+            <div className="grid grid-cols-3 border-b border-gray-300 bg-white">
+              <div className="border-r border-gray-300 px-4 py-4">
+                <p className="font-mono text-xs font-black uppercase text-gray-400">Products</p>
+                <p className="mt-2 text-3xl font-black">{stats.products}</p>
               </div>
+              <div className="border-r border-gray-300 px-4 py-4">
+                <p className="font-mono text-xs font-black uppercase text-gray-400">Places</p>
+                <p className="mt-2 text-3xl font-black">{stats.locations}</p>
+              </div>
+              <div className="px-4 py-4">
+                <p className="font-mono text-xs font-black uppercase text-gray-400">Bids</p>
+                <p className="mt-2 text-3xl font-black">{stats.openRequests}</p>
+              </div>
+            </div>
 
-              <div className="mt-5">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Quick explore</p>
-                <div className="flex flex-wrap gap-2">
-                  {explorePrompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      onClick={() => setSearch(prompt)}
-                      className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-black hover:text-black"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </section>
+            <div className="grid grid-cols-2 border-b border-gray-300">
+              <button
+                onClick={() => navigate('/report')}
+                className="border-r border-gray-300 bg-black px-5 py-6 text-left text-white hover:bg-gray-900"
+              >
+                <PackagePlus size={22} />
+                <span className="mt-5 block text-2xl font-black uppercase leading-none">Add Product</span>
+                <span className="mt-2 block font-mono text-xs font-bold uppercase text-gray-300">Report stock now</span>
+              </button>
+              <button
+                onClick={() => navigate('/requests/new')}
+                className="bg-white px-5 py-6 text-left text-black hover:bg-gray-100"
+              >
+                <ShoppingBag size={22} />
+                <span className="mt-5 block text-2xl font-black uppercase leading-none">Post Bid</span>
+                <span className="mt-2 block font-mono text-xs font-bold uppercase text-gray-500">Request a hunt</span>
+              </button>
+            </div>
 
-            <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-black text-black">Open community requests</h3>
-                <button
-                  onClick={() => navigate('/requests')}
-                  className="text-xs font-bold text-link hover:opacity-80"
-                >
-                  View all
-                </button>
-              </div>
-              <div className="space-y-3">
-                {activeRequests.map((request) => (
-                  <RequestCard key={request.id} request={request} />
-                ))}
-              </div>
-            </section>
-
-            <section className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2 text-sm font-bold text-black">
-                <Clock size={17} />
-                Latest library activity
-              </div>
-              <div className="mt-3 space-y-3">
-                {finds.slice(0, 4).map((find) => (
+            <div className="border-b border-gray-300 px-5 py-4">
+              <p className="mb-3 font-mono text-xs font-black uppercase text-gray-500">Quick Tape Filters</p>
+              <div className="grid grid-cols-1">
+                {explorePrompts.map((prompt) => (
                   <button
-                    key={find.id}
-                    onClick={() => navigate(`/find/${find.id}`)}
-                    className="flex w-full items-center justify-between gap-3 border-t border-gray-100 pt-3 text-left first:border-t-0 first:pt-0"
+                    key={prompt}
+                    onClick={() => setQuery(prompt)}
+                    className="flex items-center justify-between border-t border-gray-300 py-3 text-left first:border-t-0"
                   >
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-bold text-black">{find.product.name}</span>
-                      <span className="block truncate text-xs text-gray-500">{find.location.placeName}</span>
-                    </span>
-                    <span className="shrink-0 text-xs font-semibold text-gray-400">{timeAgo(find.createdAt)}</span>
+                    <span className="font-mono text-sm font-black uppercase">{prompt}</span>
+                    <span className="font-mono text-xs font-black text-link">OPEN</span>
                   </button>
                 ))}
               </div>
-            </section>
+            </div>
+
+            <div className="px-5 py-4">
+              <p className="mb-3 font-mono text-xs font-black uppercase text-gray-500">Recent Drops</p>
+              {finds.slice(0, 5).map((find, index) => (
+                <button
+                  key={find.id}
+                  onClick={() => navigate(`/find/${find.id}`)}
+                  className="grid w-full grid-cols-[44px_minmax(0,1fr)_54px] border-t border-gray-300 py-3 text-left first:border-t-0"
+                >
+                  <span className="font-mono text-xs font-black text-gray-400">#{tickerId(index)}</span>
+                  <span className="min-w-0 truncate font-mono text-xs font-black uppercase">{find.product.name}</span>
+                  <span className="text-right font-mono text-xs font-black text-gray-500">{stockSignal[find.stockStatus].label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </aside>
       </div>
